@@ -19,7 +19,7 @@ class UserController {
         httpOnly: true,
         // secure: true
       })
-      return res.status(200).json(user);
+      return res.json(user);
     } catch (e) {
       console.log(e);
       next(e);
@@ -28,8 +28,11 @@ class UserController {
 
   async login(req, res, next) {
     try {
-      const {email, login, password} = req.body;
-      const user = await UserService.login(email, login, password);
+      const {auth, password, isEmailOrLogin} = req.body;
+      console.log(auth);
+      console.log(password);
+      console.log(isEmailOrLogin);
+      const user = await UserService.login(auth, password, isEmailOrLogin);
       res.cookie('refreshToken', user.refreshToken, {
         maxAge: 60 * 24 * 60 * 60 * 1000,
         httpOnly: true,

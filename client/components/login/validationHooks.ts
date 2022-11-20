@@ -17,3 +17,11 @@ export const useAuthValidation = (email: string, login: string, passwordFirst: s
     }
     return "";
 }
+
+export const useCheckIfEmail = (auth: string) => {
+    const regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    if (!regex.test(auth)) {
+        return 'login'
+    }
+    return 'email';
+}

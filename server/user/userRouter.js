@@ -5,8 +5,8 @@ import {body, check} from "express-validator";
 const router = new Router();
 
 router.post('/registration',
-  body('email').isEmail(),
-  check('login', "Это поле не может быть пустым").notEmpty(),
+  check('email', "Поле почта не может быть пустым").notEmpty(),
+  check('login', "Поле логин не может быть пустым").notEmpty(),
   check('password', "Минимальная длина пароля должна быть 8 символов").isLength({min: 8}),
   userController.registration)
 router.post('/login', userController.login)

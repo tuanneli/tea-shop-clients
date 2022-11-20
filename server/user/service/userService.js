@@ -25,14 +25,14 @@ class UserService {
     }
   }
 
-  async login(email, login, password) {
-    const user = email ? await User.findOne({where: {email}}) : await User.findOne({where: {login}});
+  async login(auth, password, isEmailOrLogin) {
+    const user = (isEmailOrLogin === 'email') ? await User.findOne({where: {email: auth}}) : await User.findOne({where: {login: auth}});
     if (!user) {
-      throw ApiError.badRequest(`Неверная почта или пароль`);
+      throw ApiError.badRequest(`Неверный логин или пароль`);
     }
     const validPassword = bcrypt.compareSync(password, user.password);
     if (!validPassword) {
-      throw ApiError.badRequest("Ошибка авторизации, неверные данные");
+      throw ApiError.badRequest("Неверный логин или пароль");
     }
     const userDto = new UserDto(user);
     const tokens = TokenService.generateTokens({userDto});

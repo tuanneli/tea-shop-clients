@@ -1,118 +1,51 @@
-import React, {useState} from 'react';
-import RegistrationContent from "./RegistrationContent";
-import styled from "styled-components";
-import {useAuthValidation} from "./validationHook";
+import React, {useEffect, useState} from 'react';
+import {useAuthValidation} from "./validationHooks";
 import Error from "../error/Error";
 import Link from "next/link";
+import {Button, FormBox, Input, Label, MainContainer, SideBox} from './styledComponentsLogin';
+import {useAppDispatch, useAppSelector} from "../../store/hooks/hooksRedux";
+import {authentication} from "../../store/reducers/UserReducer/UserActionCreator";
+import {useRouter} from "next/router";
+import Loader from "../loader/Loader";
 
-const MainContainer = styled.div`
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .sidebox-left {
-    @media (max-width: 560px) {
-      color: red;
-      visibility: hidden;
-    }
-  }
-
-  .sidebox-right {
-    @media (max-width: 560px) {
-      position: absolute;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-  }
-`
-
-const SideBox = styled.div`
-  width: 100%;
-  height: 100vh;
-  margin: 10px 40px;
-  display: flex;
-  justify-content: ${props => props.dir || "center"};
-  align-items: center;
-`
-
-const FormBox = styled.div`
-  max-width: ${props => props.theme.width || "300px"};
-  width: 100%;
-  height: 100vh;
-  padding: 0 10px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: ${props => props.dir || "center"};
-`
-
-const Label = styled.div`
-  width: 100%;
-  margin: 10px 0;
-  display: flex;
-  justify-content: space-between;
-`
-
-const Input = styled.input`
-  width: 100%;
-  height: 40px;
-  border-radius: 5px;
-  padding: 0 10px;
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.25);
-  }
-`
-
-const Button = styled.button`
-  width: 100%;
-  height: 40px;
-  margin-top: 30px;
-  border-radius: 5px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background: transparent;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.5);
-  }
-`
-
-const LoginContent = () => {
+const RegistrationContent = () => {
     const [email, setEmail] = useState<string>("");
     const [login, setLogin] = useState<string>("");
-    const [name, setName] = useState<string>("");
     const [passwordFirst, setFirstPassword] = useState<string>("");
     const [passwordSecond, setSecondPassword] = useState<string>("");
     const [error, setError] = useState<string>("");
-    const [userRole, setUserRole] = useState<string>('USER');
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const router = useRouter();
+    const dispatch = useAppDispatch();
+    const state = useAppSelector(state => state.userReducer);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        console.log('here')
-        const errorText = useAuthValidation(email, login, passwordFirst, passwordSecond);
-        if (errorText) {
-            return setError(errorText)
+        let validationError = "";
+        validationError = useAuthValidation(email, login, passwordFirst, passwordSecond);
+        setError(validationError);
+        if (!validationError) {
+            await dispatch(authentication({login, email, password: passwordFirst, role: 'USER'}, 'registration'))
         }
-        console.log(error)
-        // const resError = await userStore.registration(email, name, passwordFirst, userStore.userRoleForRegistration);
-        // if (resError) {
-        //     return setError(resError)
-        // }
-        // if (!resError && !errorText) {
-        //     userStore.setUserRoleForRegistration('USER');
-        //     setError("");
-        //     navigate('/home');
-        // }
     }
 
+    useEffect(() => {
+        setIsLoading(false);
+    }, [])
+
+    useEffect(() => {
+        if (state.user.email) {
+            router.push('/')
+        } else {
+            setError(state.error)
+        }
+    }, [state.isLoading, state.error])
+
+    if (isLoading) {
+        return (
+            <Loader/>
+        )
+    }
 
     return (
         <MainContainer>
@@ -128,16 +61,23 @@ const LoginContent = () => {
             <SideBox className={'sidebox-right'} dir={"start"}>
                 <FormBox dir={"start"}>
                     <Label>Почта</Label>
-                    <Input type="text" placeholder={"Введите почту"} onChange={(e) => setEmail(e.target.value)}/>
+                    <Input type="text"
+                           placeholder={"Введите почту"}
+                           value={email}
+                           onChange={(e) => setEmail(e.target.value.trim())}/>
                     <Label>Логин</Label>
                     <Input type="text" placeholder={"Придумайте уникальный логин"}
-                           onChange={(e) => setLogin(e.target.value)}/>
+                           value={login}
+                           onChange={(e) => setLogin(e.target.value.trim())}/>
                     <Label>Пароль</Label>
                     <Input type="password" placeholder={"Введите пароль"}
-                           onChange={(e) => setFirstPassword(e.target.value)}/>
+                           value={passwordFirst}
+                           onChange={(e) => setFirstPassword(e.target.value.trim())}/>
                     <Label>Повторите пароль</Label>
-                    <Input type="password" placeholder={"Повторите пароль"}
-                           onChange={(e) => setSecondPassword(e.target.value)}/>
+                    <Input type="password"
+                           value={passwordSecond}
+                           placeholder={"Повторите пароль"}
+                           onChange={(e) => setSecondPassword(e.target.value.trim())}/>
                     <div>
                         {error ? <Error errorText={error}/> : null}
                     </div>
@@ -151,4 +91,4 @@ const LoginContent = () => {
     );
 };
 
-export default LoginContent;
+export default RegistrationContent;

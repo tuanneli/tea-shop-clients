@@ -1,6 +1,7 @@
 import React, {ReactNode} from 'react'
 import Head from "next/head";
 import styles from "../styles/Home.module.scss";
+import Navbar from "./navbar/Navbar";
 
 interface IMainLayout {
     children: ReactNode
@@ -15,9 +16,7 @@ const MainLayout = ({children}: IMainLayout) => {
                 <meta name={"description"} content="tea site"/>
                 <meta charSet={"utf-8"}/>
             </Head>
-            <nav>
-                navigation
-            </nav>
+            <Navbar/>
             <main>
                 {children}
             </main>

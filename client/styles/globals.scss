@@ -4,28 +4,85 @@
 
 html,
 body {
-    padding: 0;
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+  Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 @media (prefers-color-scheme: dark) {
-    html {
-        color-scheme: dark;
-    }
+  html {
+    color-scheme: dark;
+  }
 
-    body {
-        color: white;
-        background: black;
-    }
+  body {
+    color: white;
+    background: black;
+  }
 }
+
+$offset: 187;
+$duration: 1.4s;
+
+.spinner {
+  animation: rotator $duration linear infinite;
+}
+
+@keyframes rotator {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(270deg);
+  }
+}
+
+.path {
+  stroke-dasharray: $offset;
+  stroke-dashoffset: 0;
+  transform-origin: center;
+  animation: dash $duration ease-in-out infinite,
+  colors ($duration*4) ease-in-out infinite;
+}
+
+@keyframes colors {
+  0% {
+    stroke: #4285F4;
+  }
+  25% {
+    stroke: #efefef;
+  }
+  50% {
+    stroke: #F7C223;
+  }
+  75% {
+    stroke: #1B9A59;
+  }
+  100% {
+    stroke: #4285F4;
+  }
+}
+
+@keyframes dash {
+  0% {
+    stroke-dashoffset: $offset;
+  }
+  50% {
+    stroke-dashoffset: $offset/4;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: $offset;
+    transform: rotate(450deg);
+  }
+}
+
